@@ -3,22 +3,31 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack -p 80",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 80",
     "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/client": "^5.21.1",
+    "axios": "^1.7.7",
+    "bymax-react-select": "^2.1.0",
+    "next": "15.0.1",
+    "next-auth": "^4.24.10",
+    "openai": "^4.68.4",
     "react": "19.0.0-rc-69d4b800-20241021",
     "react-dom": "19.0.0-rc-69d4b800-20241021",
-    "next": "15.0.1"
+    "react-google-recaptcha-v3": "^1.10.1",
+    "react-icons": "^5.3.0",
+    "uuid": "^11.0.0"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
+    "@types/node": "^20.17.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "prisma": "^5.21.1",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }
