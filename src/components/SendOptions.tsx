@@ -15,6 +15,7 @@ interface SendOptionsProps {
 export default function SendOptions({ uuid }: SendOptionsProps) {
   const [keyboardPressed, setKeyboardPressed] = useState(false);
   const [hasText, setHasText] = useState(false);
+  const [gotAnswer, setGotAnswer] = useState(true);
   const [inputText, setInputText] = useState<string>();
   const { recording, startRecording, stopRecording, text } = useRecordAudio();
   const { data: session } = useSession();
@@ -32,13 +33,13 @@ export default function SendOptions({ uuid }: SendOptionsProps) {
   }, [text]);
 
   async function sendMessage() {
+    setGotAnswer(false);
     if (inputText === "" && !text) {
       alert("Please enter a message or record audio before sending.");
       return; // Sai da função se ambos forem nulos
     }
 
-    const messageContent = text || inputText;
-    alert(messageContent);
+    const messageContent = inputText || text;
 
     setHasText(false);
     setInputText("");
@@ -55,10 +56,11 @@ export default function SendOptions({ uuid }: SendOptionsProps) {
     };
 
     try {
-      // Envia a mensagem para criar a mensagem diretamente
       await axios.post(`/api/chat/${uuid}`, postData, {
         headers: { "Content-Type": "application/json" },
       });
+
+      setGotAnswer(true);
     } catch (error) {
       console.error("Error sending message:", error);
       alert(error);
@@ -66,7 +68,11 @@ export default function SendOptions({ uuid }: SendOptionsProps) {
   }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") sendMessage();
+    if (e.key === "Enter") {
+      if (inputText === "" || !inputText) return;
+      if (!gotAnswer) return;
+      sendMessage();
+    }
   };
 
   useEffect(() => {
@@ -98,13 +104,18 @@ export default function SendOptions({ uuid }: SendOptionsProps) {
             className="bg-slate-800 w-full ps-5 outline-none"
           />
           <div className="flex justify-around mx-4">
-            <IconButton icon={<FaImage />} />
+            <IconButton icon={<FaImage />} disabled={!gotAnswer} />
             {hasText ? (
-              <IconButton icon={<IoSend />} onClick={sendMessage} />
+              <IconButton
+                icon={<IoSend />}
+                onClick={sendMessage}
+                disabled={!gotAnswer}
+              />
             ) : (
               <IconButton
                 icon={<FaMicrophone />}
                 onClick={() => setKeyboardPressed(false)}
+                disabled={!gotAnswer}
               />
             )}
           </div>
@@ -114,19 +125,25 @@ export default function SendOptions({ uuid }: SendOptionsProps) {
           <IconButton
             icon={<FaKeyboard className="text-2xl" />}
             onClick={() => setKeyboardPressed(true)}
+            disabled={!gotAnswer}
           />
           {recording ? (
             <IconButton
               icon={<FaSquare className="text-5xl" />}
               onClick={stopRecording}
+              disabled={!gotAnswer}
             />
           ) : (
             <IconButton
               icon={<FaMicrophone className="text-5xl" />}
               onClick={startRecording}
+              disabled={!gotAnswer}
             />
           )}
-          <IconButton icon={<FaImage className="text-2xl" />} />
+          <IconButton
+            icon={<FaImage className="text-2xl" />}
+            disabled={!gotAnswer}
+          />
         </div>
       )}
     </section>
@@ -136,11 +153,13 @@ export default function SendOptions({ uuid }: SendOptionsProps) {
 interface IconButtonProps {
   icon: React.ReactNode;
   onClick?: () => void;
+  disabled: boolean;
 }
 
-const IconButton = ({ icon, onClick }: IconButtonProps) => (
+const IconButton = ({ icon, onClick, disabled }: IconButtonProps) => (
   <button
     onClick={onClick}
+    disabled={disabled}
     className="hover:bg-slate-900 p-2 rounded-full transition ease-in-out duration-200"
   >
     {icon}
