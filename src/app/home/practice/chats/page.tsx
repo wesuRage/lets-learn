@@ -1,6 +1,7 @@
 "use client";
 
 import ChatBalloon from "@/components/Balloons/ChatBalloon";
+import Spinner from "@/components/Spinner";
 import axios from "axios";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -41,11 +42,11 @@ export default function Chats() {
               onClick={() => signOut()}
               className="flex font-bold hover:text-red-500 transition ease-in-out duration-150"
             >
-              <BiLogOut className="text-2xl me-2" /> Sign Out
+              <BiLogOut className="text-2xl me-2" /> Sair
             </button>
           </div>
-          <div className="text-center mt-20">
-            <h1 className="text-2xl font-bold">Loading...</h1>
+          <div className="flex justify-center mt-20">
+            <Spinner />
           </div>
         </section>
       </main>
@@ -61,7 +62,7 @@ export default function Chats() {
             onClick={() => signOut()}
             className="flex font-bold hover:text-red-500 transition ease-in-out duration-150"
           >
-            <BiLogOut className="text-2xl me-2" /> Sign Out
+            <BiLogOut className="text-2xl me-2" /> Sair
           </button>
         </div>
         <div className="text-center mt-20">
@@ -70,7 +71,7 @@ export default function Chats() {
             className="hover:scale-125 transition ease-in-out duration-150 border-2 border-slate-800 hover:bg-slate-800 rounded-xl p-2 relative top-3"
           >
             <p className="font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-700 inline-block text-transparent bg-clip-text">
-              Start New Chat
+              Iniciar Novo Chat
             </p>
           </button>
           <br />
