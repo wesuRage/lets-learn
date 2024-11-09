@@ -51,7 +51,10 @@ export default function NewChat() {
     const chatId = uuidv4();
     const userId = session?.user.id;
 
-    console.log(userId);
+    if (!languageOption || !feedbackOption || !level || !topic) {
+      alert("Please fill in all required fields.");
+      return;
+    }
 
     try {
       await axios.post(
@@ -64,6 +67,7 @@ export default function NewChat() {
           feedback: feedbackOption.value,
           level: level.value,
           personality,
+          textContent: "",
         },
         { headers: { "Content-Type": "application/json" } }
       );
