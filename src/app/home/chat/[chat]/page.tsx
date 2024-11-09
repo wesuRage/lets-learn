@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { useSession } from "next-auth/react";
 import BotBalloon from "@/components/Balloons/BotBalloon";
+import Spinner from "@/components/Spinner";
 
 export default function Home({ params }: any) {
   const { chat } = React.use(params);
@@ -34,7 +35,8 @@ export default function Home({ params }: any) {
         if (!response.data || !Array.isArray(response.data.data)) {
           router.push("/not-found");
         } else {
-          setChatData(response.data.data);
+          const data = await response.data;
+          setChatData(data.data);
         }
       } catch (error) {
         console.error("Error fetching chat data:", error);
@@ -53,8 +55,8 @@ export default function Home({ params }: any) {
 
   if (loading || !chatData) {
     return (
-      <main className="h-full bg-slate-800 rounded-xl p-6 m-6">
-        <div>Carregando...</div>
+      <main className="h-full bg-slate-800 rounded-xl p-6 m-6 flex justify-center">
+        <Spinner size={8} />
       </main>
     );
   }
@@ -72,7 +74,7 @@ export default function Home({ params }: any) {
               <BotBalloon
                 key={index}
                 message={item.content.text}
-                audio={item.content.audioData}
+                messageId={item.messageId}
                 translation={item.content.translation}
               />
             );
