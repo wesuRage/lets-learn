@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Key, useState } from "react";
 
 function formatTimestamp(timestamp: string) {
   // Cria um objeto Date a partir da string
@@ -27,23 +26,18 @@ interface ChatBalloonProps {
   id: string;
   title: string;
   createdAt: string;
-  key: Key;
 }
 
 export default function ChatBalloon({
   id,
   title,
   createdAt,
-  key,
 }: ChatBalloonProps) {
   return (
     <Link href={`/home/chat/${id}`}>
-      <section
-        key={key}
-        className="bg-slate-800 rounded-xl mb-4 p-4 w-full text-left transition-all ease-in-out duration-150 hover:scale-105"
-      >
+      <section className="bg-slate-800 rounded-xl mb-4 p-4 w-full text-left transition-all ease-in-out duration-150 hover:scale-105">
         <div className="w-full">
-          <h2 className="truncate text-2xl font-bold italic">{title}</h2>
+          <h2 className="line-clamp-2 text-2xl font-bold italic">{title}</h2>
           <div className="flex justify-between items-center">
             <p>Created at: </p>
             <span className="bg-slate-900 px-2 py-1 rounded-xl font-bold">
