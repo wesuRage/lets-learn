@@ -41,7 +41,9 @@ export default function RootLayout({
       <SessionProvider>
         <section className="w-full p-6 fixed flex flex-1 justify-between flex-col h-full">
           <Header title={title} id={chatId as string} />
+
           {children}
+
           <SendOptions uuid={chatId as string} />
         </section>
       </SessionProvider>
