@@ -1,6 +1,7 @@
 "use client";
 
 import LanguageSelector from "@/components/LanguageSelector";
+import Spinner from "@/components/Spinner";
 import axios from "axios";
 import { Select, Option } from "bymax-react-select";
 import { useSession } from "next-auth/react";
@@ -16,23 +17,24 @@ export default function NewChat() {
   const [level, setLevel] = useState<any>(null);
   const [topic, setTopic] = useState<string | null>(null);
   const [personality, setPersonality] = useState<string>("");
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   const { data: session } = useSession();
   const router = useRouter();
 
   const randomInt = Math.floor(Math.random() * (10 - 0 + 1)) + 0;
   const placeHolders = [
-    "A conversation at an airport gate",
-    "A dialog in a busy coffee shop",
-    "A chat about a book club meeting",
-    "A dialog on a train to London",
-    "A conversation at a beach resort",
-    "A dialog at a tech conference",
-    "A talk in a quiet library",
-    "A chat during a cooking class",
-    "A conversation at a farmer's market",
-    "A dialog at a wedding reception",
-    "A dialog on restaurant in Paris",
+    "Uma conversa em um portão de embarque no aeroporto",
+    "Um diálogo em uma cafeteria movimentada",
+    "Uma conversa sobre uma reunião de clube do livro",
+    "Um diálogo em um trem para Londres",
+    "Uma conversa em um resort de praia",
+    "Um diálogo em uma conferência de tecnologia",
+    "Uma conversa em uma biblioteca silenciosa",
+    "Um bate-papo durante uma aula de culinária",
+    "Uma conversa em uma feira de agricultores",
+    "Um diálogo em uma recepção de casamento",
+    "Um diálogo em um restaurante em Paris",
   ];
 
   const options: Option[] = useMemo(
@@ -52,9 +54,11 @@ export default function NewChat() {
     const userId = session?.user.id;
 
     if (!languageOption || !feedbackOption || !level || !topic) {
-      alert("Please fill in all required fields.");
+      alert("Por favor preencha todos os campos");
       return;
     }
+
+    setDisabled(true);
 
     try {
       await axios.post(
@@ -92,7 +96,7 @@ export default function NewChat() {
         </div>
         <section className="flex items-center justify-between w-full gap-4 mb-4">
           <h1 className="font-bold whitespace-nowrap">
-            Learn<span className="text-red-500">*</span>:
+            Aprenda<span className="text-red-500">*</span>:
           </h1>
           <div className="w-72">
             <LanguageSelector
@@ -116,7 +120,7 @@ export default function NewChat() {
 
         <section className="flex items-center justify-between w-full gap-4 mb-4">
           <h1 className="font-bold whitespace-nowrap">
-            Level<span className="text-red-500">*</span>:
+            Nível<span className="text-red-500">*</span>:
           </h1>
           <div className="w-72 text-black">
             <Select
@@ -125,8 +129,8 @@ export default function NewChat() {
               isMulti={false}
               isClearable={false}
               options={options}
-              placeholder="Select the CEFR Level"
-              noOptionsMessage="Level not found"
+              placeholder="Selecione o Nível CEFR"
+              noOptionsMessage="Nível não encontrado"
               onChange={(selectedOption) => setLevel(selectedOption)}
             />
           </div>
@@ -135,7 +139,7 @@ export default function NewChat() {
         <section>
           <label htmlFor="topic">
             <p className="font-bold">
-              Main topic on the chat<span className="text-red-500">*</span>:
+              Assunto principal do chat<span className="text-red-500">*</span>:
             </p>
             <input
               type="text"
@@ -150,27 +154,32 @@ export default function NewChat() {
 
         <section className="mt-4">
           <label htmlFor="personality">
-            <p className="font-bold">IA's personality:</p>
+            <p className="font-bold">Personalidade da IA:</p>
             <input
               type="text"
               name="personality"
               autoComplete="off"
               onChange={(e) => setPersonality(e.target.value)}
-              placeholder="The way you want it to behave."
+              placeholder="Como você quer que ela se comporte"
               className="outline-none w-full rounded-md bg-slate-800 text-slate-300 p-2"
             />
           </label>
         </section>
 
         <section className="w-full flex justify-center">
-          <button
-            onClick={createChat}
-            className="hover:scale-125 transition ease-in-out duration-150 border-2 border-slate-800 hover:bg-slate-800 rounded-xl p-2 relative top-3"
-          >
-            <p className="font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-700 inline-block text-transparent bg-clip-text">
-              Start New Chat
-            </p>
-          </button>
+          {disabled ? (
+            <Spinner />
+          ) : (
+            <button
+              disabled={disabled}
+              onClick={createChat}
+              className="hover:scale-125 transition ease-in-out duration-150 border-2 border-slate-800 hover:bg-slate-800 rounded-xl p-2 relative top-3"
+            >
+              <p className="font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-700 inline-block text-transparent bg-clip-text">
+                Iniciar Novo Chat
+              </p>
+            </button>
+          )}
         </section>
       </div>
     </main>
