@@ -1,13 +1,3 @@
-interface PromptProps {
-  language: string | undefined;
-  level: string | undefined;
-  feedback: string | undefined;
-  title: string | undefined;
-  personality: string | undefined;
-  name: string | undefined;
-  gender: string | undefined;
-}
-
 export const prompter = (
   feedback: string | undefined,
   language: string | undefined,
@@ -26,7 +16,7 @@ Again, this restaurant guideline was ONLY an example. Don't talk about restauran
 In addition, follow these guidelines:
 
   1) Use the target language in all interactions, but provide translations into the student's native language whenever introducing new words or expressions.
-  2) Incorporate the requested personality into each lesson, adapting your teaching style to the character (in this case, an attentive and polite waiter).
+  2) Incorporate the requested personality into each lesson, adapting your teaching style to the character (for example, an attentive and polite waiter).
   3) Provide cultural cues about typical waiter behavior in the language's home country and how customers interact with them.
   4) Gently correct the student's pronunciation or vocabulary mistakes, offering more natural or polite alternatives.
   5) Adapt the level of complexity of the language according to the student's progress.
