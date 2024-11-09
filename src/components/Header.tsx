@@ -28,7 +28,7 @@ export default function Header({ title, id }: HeaderProps) {
         >
           <BiArrowBack />
         </Link>
-        <h1 className="font-bold text-2xl">{title}</h1>
+        <h1 className="font-bold text-2xl truncate">{title}</h1>
       </div>
       <button
         onClick={deleteChat}
