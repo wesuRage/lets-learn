@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import SendOptions from "@/components/SendOptions";
 import axios from "axios";
 import { SessionProvider } from "next-auth/react";
-import { usePathname } from "next/navigation"; // Importando usePathname
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const chatId = pathname.split("/").pop(); // Pega o último segmento do caminho
+  const chatId = pathname.split("/").pop();
   console.log(chatId);
 
   const [title, setTitle] = useState<string>();
@@ -23,15 +23,15 @@ export default function RootLayout({
       if (chatId) {
         try {
           const response = await axios.get(`/api/chat/${chatId}`);
-          setTitle(await response.data.data.title); // Ajuste isso com base na resposta real da API
+          setTitle(await response.data.data.title);
         } catch (error) {
           console.error("Error fetching title:", error);
         }
       }
     };
 
-    fetchTitle(); // Chama a função fetchTitle
-  }, [chatId]); // Adicione chatId como dependência
+    fetchTitle();
+  }, [chatId]);
 
   return (
     <body
