@@ -1,18 +1,16 @@
 import prisma from "../../../../prisma";
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "../../../../utils/connectToDatabase";
+import { connectToDatabase } from "@/utils/connectToDatabase";
 
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
 
     const { userId } = await req.json();
-    console.log(userId);
 
     return NextResponse.json(
       {
-        data: await prisma.chat.findMany(),
-        userId,
+        data: await prisma.chat.findMany({ where: { userId } }),
       },
       { status: 200 }
     );
