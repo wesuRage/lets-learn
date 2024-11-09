@@ -147,8 +147,8 @@ export default function LanguageSelector({ option, setOption }: any) {
         isMulti={false}
         isClearable={false}
         options={options}
-        placeholder="Select a language"
-        noOptionsMessage="Language not found"
+        placeholder="Selecione um idioma"
+        noOptionsMessage="Idioma não encontrado"
         onChange={(selectedOption) => setOption(selectedOption)}
       />
     </div>

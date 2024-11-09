@@ -34,7 +34,7 @@ export default function Header({ title, id }: HeaderProps) {
         onClick={deleteChat}
         className="flex font-bold hover:text-red-500 transition ease-in-out duration-150"
       >
-        <TbTrash className="text-2xl me-2" /> Delete Chat
+        <TbTrash className="text-2xl me-2" /> Deletar Chat
       </button>
     </section>
   );
