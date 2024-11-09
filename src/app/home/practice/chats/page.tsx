@@ -4,7 +4,7 @@ import ChatBalloon from "@/components/Balloons/ChatBalloon";
 import axios from "axios";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import { BiLogOut } from "react-icons/bi";
 
 export default function Chats() {
@@ -16,10 +16,11 @@ export default function Chats() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (session?.user.id == undefined) return;
         const response = await axios.post("/api/chats/", {
           userId: session?.user.id,
         });
-        setChatData(response.data.data); // Armazena os dados do chat
+        if (response.data !== undefined) setChatData(response.data.data); // Armazena os dados do chat
       } catch (error) {
         console.error("Error fetching chat data:", error);
       } finally {
@@ -28,7 +29,7 @@ export default function Chats() {
     };
 
     fetchData(); // Chama a função de busca de dados
-  }, []);
+  }, [session?.user.id]);
 
   if (loading) {
     return (
@@ -64,17 +65,19 @@ export default function Chats() {
           </button>
         </div>
         <div className="text-center mt-20">
-          {chatData !== null ? (
+          <button
+            onClick={() => router.push("/home/practice/new-chat")}
+            className="hover:scale-125 transition ease-in-out duration-150 border-2 border-slate-800 hover:bg-slate-800 rounded-xl p-2 relative top-3"
+          >
+            <p className="font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-700 inline-block text-transparent bg-clip-text">
+              Start New Chat
+            </p>
+          </button>
+          <br />
+          <br />
+          {chatData !== null && (
             <div>
-              <button
-                onClick={() => router.push("/home/practice/new-chat")}
-                className="hover:scale-125 transition ease-in-out duration-150 border-2 border-slate-800 hover:bg-slate-800 rounded-xl p-2 relative bottom-3"
-              >
-                <p className="font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-700 inline-block text-transparent bg-clip-text">
-                  Start New Chat
-                </p>
-              </button>
-              {chatData.map((chat: any, index: number) => (
+              {chatData.map((chat: any, index: Key) => (
                 <ChatBalloon
                   key={index}
                   id={chat.chatId}
@@ -83,15 +86,6 @@ export default function Chats() {
                 />
               ))}
             </div>
-          ) : (
-            <button
-              onClick={() => router.push("/home/practice/new-chat")}
-              className="hover:scale-125 transition ease-in-out duration-150 border-2 border-slate-800 hover:bg-slate-800 rounded-xl p-2 relative top-3"
-            >
-              <p className="font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-700 inline-block text-transparent bg-clip-text">
-                Start New Chat
-              </p>
-            </button>
           )}
         </div>
       </section>
