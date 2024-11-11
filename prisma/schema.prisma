@@ -34,15 +34,26 @@ model Chat {
 model Message {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   sender    String
-  content   Content
+  messageId String   @unique
+  content   Content?
   timestamp DateTime
   chatId    String   
-  chat      Chat?     @relation(fields: [chatId], references: [id])
+  chat      Chat?    @relation(fields: [chatId], references: [id])
+}
+
+model Audio {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  audioData  String
+  messageId  String    @unique
+}
+
+model Attachment {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  attachment String
+  messageId  String    @unique
 }
 
 type Content {
-  attachment  String?
-  audioData   String?
   translation String?
   text        String?
 }
