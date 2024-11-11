@@ -39,10 +39,10 @@ function SignInContent() {
   return (
     <div>
       <section className="p-10 h-full">
-        <h1 className="leading-normal mb-6 font-bold text-6xl max-w-[270px]">
-          Sign In and Start
+        <h1 className="leading-normal mb-6 font-bold text-6xl max-w-[300px]">
+          Entre e comece a
           <span className="font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-700 inline-block text-transparent bg-clip-text">
-            Learning
+            Aprender
           </span>
           !
         </h1>
@@ -60,7 +60,7 @@ function SignInContent() {
                 : ""
             }`}
           >
-            Sign In with Google
+            Entre com o Google
           </span>
         </button>
         <p className="text-red-500 font-bold">{error?.message}</p>
