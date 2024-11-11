@@ -1,12 +1,9 @@
 import prisma from "../../../../../../prisma";
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/utils/connectToDatabase";
 
 export async function GET(req: Request, { params }: any) {
   try {
     const { userId, chatId } = await params;
-
-    await connectToDatabase();
 
     // Verifica se o chat pertence ao usuário especificado
     const chat = await prisma.chat.findFirst({
@@ -28,6 +25,18 @@ export async function GET(req: Request, { params }: any) {
     // Busca todas as mensagens desse chat
     const messages = await prisma.message.findMany({
       where: { chatId: chatId },
+      select: {
+        sender: true,
+        chatId: true,
+        timestamp: true,
+        messageId: true,
+        content: {
+          select: {
+            text: true,
+            translation: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({ data: messages }, { status: 200 });
@@ -37,7 +46,5 @@ export async function GET(req: Request, { params }: any) {
       { error: "Erro interno do servidor" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
