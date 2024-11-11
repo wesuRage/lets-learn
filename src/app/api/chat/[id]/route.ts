@@ -1,9 +1,10 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../../../../../prisma";
 import { NextResponse } from "next/server";
-import { openai } from "@/utils/openai";
+import { openai } from "@/libs/openai";
 import { prompter } from "@/utils/prompter";
 import translator, { LanguageCode } from "open-google-translator";
+import { v4 as uuidv4 } from "uuid";
 
 export async function GET(req: Request, { params }: any) {
   const { id } = await params;
@@ -58,17 +59,13 @@ export async function POST(req: Request) {
       });
     }
 
-    const userMessage = await createMessage(
+    await createMessage(
       chat.language,
       chat.feedback,
       chat.chatId,
       "user",
       textContent
     );
-
-    if (!chat) {
-      return NextResponse.json({ message: userMessage }, { status: 201 });
-    }
 
     const botResponse = await generateBotResponse(chat, textContent);
     const botMessage = await createMessage(
@@ -125,31 +122,54 @@ async function createMessage(
   audioData: string | null = null
 ) {
   const regex = /\(([^()]*)\)(?!.*\().*/;
-
   const lang = language?.match(regex)?.toString().split(",")[1];
   const feed = feedback?.match(regex)?.toString().split(",")[1];
 
-  await translator
-    .TranslateLanguageData({
-      listOfWordsToTranslate: [text],
-      fromLanguage: lang! as unknown as LanguageCode,
-      toLanguage: feed! as unknown as LanguageCode,
-    })
-    .then((data) => {
-      return prisma.message.create({
-        data: {
-          content: {
-            attachment: null,
-            audioData,
-            translation: data[0].translation,
-            text,
-          },
-          timestamp: new Date(),
-          sender,
-          chatId,
-        },
-      });
+  // Gera o UUID para `messageId`
+  const messageId = uuidv4();
+
+  const translatedText = await translator.TranslateLanguageData({
+    listOfWordsToTranslate: [text],
+    fromLanguage: lang! as unknown as LanguageCode,
+    toLanguage: feed! as unknown as LanguageCode,
+  });
+
+  // Cria a mensagem principal
+  const message = await prisma.message.create({
+    data: {
+      messageId,
+      content: {
+        translation: translatedText[0].translation,
+        text,
+      },
+      timestamp: new Date(),
+      sender,
+      chatId,
+    },
+  });
+
+  // Se houver áudio, cria entrada em `Audio`
+  if (audioData) {
+    await prisma.audio.create({
+      data: {
+        audioData,
+        messageId,
+      },
     });
+  }
+
+  // Se houver anexo, cria entrada em `Attachment`
+  const attachment = null;
+  if (attachment) {
+    await prisma.attachment.create({
+      data: {
+        attachment,
+        messageId,
+      },
+    });
+  }
+
+  return message;
 }
 
 async function generateBotResponse(chat: any, userText: string) {
@@ -196,8 +216,8 @@ async function getChatHistory(chatId: string) {
   return messages
     .map((msg) =>
       msg.sender === "bot"
-        ? `GPT: ${msg.content.text}`
-        : `STUDENT: ${msg.content.text}`
+        ? `GPT: ${msg.content!.text}`
+        : `STUDENT: ${msg.content!.text}`
     )
     .join("\n");
 }
