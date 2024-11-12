@@ -1,3 +1,5 @@
+"use client";
+
 import { Key } from "react";
 
 interface UserBalloonProps {
