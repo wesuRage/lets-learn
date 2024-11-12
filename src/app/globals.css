@@ -2,9 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-1: #1e293b;
+  --bg-2: #0f172a;
+  --bg-3: #334155;
+}
+
 ::selection {
   background-color: rgb(37, 235, 136);
-  color: #1e293b;
+  color: var(--bg-1);
 }
 
 ::-webkit-scrollbar {
@@ -12,9 +18,10 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: var(--bg-3);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #0f172a;
+  background: var(--bg-2);
+  border-radius: 10px;
 }
