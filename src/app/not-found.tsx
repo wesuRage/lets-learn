@@ -11,12 +11,15 @@ export default function NotFound() {
           <p>Page Not Found</p>
         </div>
         <br />
-        <Link
-          href="/home/practice/chats"
-          className="underline flex items-center justify-center"
-        >
-          Go Back <GoArrowUpRight />
-        </Link>
+        <div className="flex items-center justify-center">
+          <Link
+            href="/home/practice/chats"
+            className="underline flex items-center text-slate-400"
+          >
+            Go Back
+            <GoArrowUpRight />
+          </Link>
+        </div>
       </section>
     </main>
   );
