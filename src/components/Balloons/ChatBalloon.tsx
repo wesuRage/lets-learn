@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { motion, Variants } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { Dispatch, SetStateAction } from "react";
 
 function formatTimestamp(timestamp: string) {
   // Cria um objeto Date a partir da string
@@ -26,26 +29,41 @@ interface ChatBalloonProps {
   id: string;
   title: string;
   createdAt: string;
+  variants: Variants | undefined;
+  setPageSwitch: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function ChatBalloon({
   id,
   title,
   createdAt,
+  variants,
+  setPageSwitch,
 }: ChatBalloonProps) {
+  const router = useRouter();
   return (
-    <Link href={`/home/chat/${id}`}>
-      <section className="bg-slate-800 rounded-xl mb-4 p-4 w-full text-left transition-all ease-in-out duration-150 hover:scale-105">
-        <div className="w-full">
-          <h2 className="line-clamp-2 text-2xl font-bold italic">{title}</h2>
-          <div className="flex justify-between items-center">
-            <p>Created at: </p>
-            <span className="bg-slate-900 px-2 py-1 rounded-xl font-bold">
-              {formatTimestamp(createdAt)}
-            </span>
+    <button
+      onClick={() => {
+        setPageSwitch(true);
+        setTimeout(() => {
+          router.push(`/home/chat/${id}`);
+        }, 500);
+      }}
+      className="bg-slate-800 rounded-xl mb-4 p-4 w-full text-left transition-all ease-in-out duration-150 hover:scale-105"
+    >
+      <div>
+        <motion.div variants={variants}>
+          <div className="w-full">
+            <h2 className="line-clamp-2 text-2xl font-bold italic">{title}</h2>
+            <div className="flex justify-between items-center">
+              <p>Created at: </p>
+              <span className="bg-slate-900 px-2 py-1 rounded-xl font-bold">
+                {formatTimestamp(createdAt)}
+              </span>
+            </div>
           </div>
-        </div>
-      </section>
-    </Link>
+        </motion.div>
+      </div>
+    </button>
   );
 }
