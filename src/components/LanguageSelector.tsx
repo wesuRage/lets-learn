@@ -143,6 +143,7 @@ export default function LanguageSelector({ option, setOption }: any) {
     <div className="text-black max-w-72">
       <Select
         id="language-selector"
+        styles={styles}
         value={option ?? ""}
         isMulti={false}
         isClearable={false}
@@ -154,3 +155,38 @@ export default function LanguageSelector({ option, setOption }: any) {
     </div>
   );
 }
+
+export const styles = {
+  control: () => ({
+    outlineStyle: "none",
+    backgroundColor: "#1e293b",
+    borderColor: "#1e293b",
+    borderRadius: "8px",
+    padding: "5px",
+    boxShadow: "none",
+    "&:hover": { borderColor: "#0f172a" },
+  }),
+  placeholder: () => ({
+    color: "#a0a0a0",
+    fontSize: "14px",
+  }),
+  option: () => ({
+    backgroundColor: "#1e293b",
+    color: "#fff",
+    padding: "10px",
+    "&:hover": { backgroundColor: "#0f172a" },
+  }),
+  menu: () => ({
+    borderRadius: "8px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    marginTop: "5px",
+  }),
+  singleValue: () => ({
+    color: "#fff",
+  }),
+  noOptionsMessage: () => ({
+    backgroundColor: "#1e293b",
+    color: "#ff6b6b",
+    fontSize: "14px",
+  }),
+};
