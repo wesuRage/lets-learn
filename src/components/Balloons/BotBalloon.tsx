@@ -1,14 +1,16 @@
 import axios from "axios";
-import { Key, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { HiTranslate } from "react-icons/hi";
 import { HiMiniSpeakerWave } from "react-icons/hi2";
+import { MdContentCopy } from "react-icons/md";
+
 import Spinner from "../Spinner";
 
 interface BotBalloonProps {
-  key: Key;
-  message: string;
-  messageId: string;
-  translation: string;
+  message?: string;
+  messageId?: string;
+  translation?: string;
+  loading?: boolean;
 }
 
 function format(message: string) {
@@ -32,10 +34,10 @@ function format(message: string) {
 }
 
 export default function BotBalloon({
-  key,
   message,
   messageId,
   translation,
+  loading,
 }: BotBalloonProps) {
   const [showTranslation, setShowTranslation] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
@@ -74,33 +76,56 @@ export default function BotBalloon({
     }
   }
 
+  function copy(text: string) {
+    navigator.clipboard.writeText(text);
+  }
+
   return (
-    <section key={key}>
-      <div className="max-w-[80%]">
-        {showTranslation ? format(translation) : format(message)}
+    <section className="flex">
+      <div className="relative top-2 w-0 h-0 border-t-[0px] border-t-transparent border-r-[15px] border-r-slate-900 border-b-[15px] border-b-transparent">
+        <div className="relative left-[2px] top-[1px] w-0 h-0 border-t-[0px] border-t-transparent border-r-[15px] border-r-slate-800 border-b-[15px] border-b-transparent"></div>
       </div>
+      <div className="border border-slate-900 max-w-[80%] p-2 my-2 rounded-xl rounded-tl-none">
+        {loading ? (
+          <Spinner />
+        ) : (
+          <>
+            <div>
+              {showTranslation ? format(translation!) : format(message!)}
+            </div>
+            <section className="flex items-center">
+              <div className="flex gap-2">
+                {disabled ? (
+                  <Spinner />
+                ) : (
+                  <button
+                    className="text-2xl p-3 rounded-full hover:bg-slate-900 transition ease-in-out duration-150"
+                    onClick={() => findAndPlay(messageId!)}
+                  >
+                    <HiMiniSpeakerWave />
+                  </button>
+                )}
 
-      <section className="flex items-center">
-        <div className="flex gap-2">
-          {disabled ? (
-            <Spinner />
-          ) : (
-            <button
-              className="text-2xl p-3 rounded-full"
-              onClick={() => findAndPlay(messageId)}
-            >
-              <HiMiniSpeakerWave />
-            </button>
-          )}
+                <button
+                  className="text-2xl p-3 rounded-full hover:bg-slate-900 transition ease-in-out duration-150"
+                  onClick={() => setShowTranslation(!showTranslation)}
+                >
+                  <HiTranslate />
+                </button>
 
-          <button
-            className="text-2xl p-3 rounded-full"
-            onClick={() => setShowTranslation(!showTranslation)}
-          >
-            <HiTranslate />
-          </button>
-        </div>
-      </section>
+                <button
+                  className="text-2xl p-3 rounded-full hover:bg-slate-900 transition ease-in-out duration-150"
+                  onClick={() =>
+                    showTranslation ? copy(translation!) : copy(message!)
+                  }
+                >
+                  <MdContentCopy />
+                </button>
+              </div>
+            </section>
+          </>
+        )}
+      </div>
     </section>
   );
 }
