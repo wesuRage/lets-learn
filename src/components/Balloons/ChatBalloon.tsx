@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { motion, Variants } from "framer-motion";
+import { motion, Variant, Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
 
@@ -28,21 +27,29 @@ function formatTimestamp(timestamp: string) {
 interface ChatBalloonProps {
   id: string;
   title: string;
+  language: string;
+  feedback: string;
   createdAt: string;
-  variants: Variants | undefined;
+  button_variant: Variants | undefined;
+  text_variant: Variants | undefined;
   setPageSwitch: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function ChatBalloon({
   id,
   title,
+  language,
+  feedback,
   createdAt,
-  variants,
+  button_variant,
+  text_variant,
   setPageSwitch,
 }: ChatBalloonProps) {
   const router = useRouter();
+
   return (
-    <button
+    <motion.button
+      variants={button_variant}
       onClick={() => {
         setPageSwitch(true);
         setTimeout(() => {
@@ -52,11 +59,15 @@ export default function ChatBalloon({
       className="bg-slate-800 rounded-xl mb-4 p-4 w-full text-left transition-all ease-in-out duration-150 hover:scale-105"
     >
       <div>
-        <motion.div variants={variants}>
+        <motion.div variants={text_variant}>
           <div className="w-full">
             <h2 className="line-clamp-2 text-2xl font-bold italic">{title}</h2>
+            <div className="my-2">
+              <p>Idioma: {language}</p>
+              <p>Feedback: {feedback}</p>
+            </div>
             <div className="flex justify-between items-center">
-              <p>Created at: </p>
+              <p className="font-bold">Criado em: </p>
               <span className="bg-slate-900 px-2 py-1 rounded-xl font-bold">
                 {formatTimestamp(createdAt)}
               </span>
@@ -64,6 +75,6 @@ export default function ChatBalloon({
           </div>
         </motion.div>
       </div>
-    </button>
+    </motion.button>
   );
 }
