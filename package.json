@@ -12,6 +12,7 @@
     "@prisma/client": "^5.22.0",
     "axios": "^1.7.7",
     "bymax-react-select": "^2.1.0",
+    "framer-motion": "^11.11.11",
     "keyv": "^4.5.4",
     "next": "15.0.3",
     "next-auth": "^4.24.10",
