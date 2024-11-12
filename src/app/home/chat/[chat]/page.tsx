@@ -9,9 +9,10 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { useSession } from "next-auth/react";
 import BotBalloon from "@/components/Balloons/BotBalloon";
-import Spinner from "@/components/Spinner";
+import { motion } from "framer-motion";
+import { PageSwitch } from "@/components/transitions/PageSwitch";
 
-export default function Home({ params }: any) {
+export default function Chat({ params }: any) {
   const { chat } = React.use(params);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -55,33 +56,56 @@ export default function Home({ params }: any) {
 
   if (loading || !chatData) {
     return (
-      <main className="h-full bg-slate-800 rounded-xl p-6 m-6 flex justify-center">
-        <Spinner size={8} />
-      </main>
+      <div className="fixed top-0 left-0 w-full h-full bg-slate-700 text-slate-700">
+        .
+      </div>
     );
   }
 
   return (
-    <main className="min-h-[75%] max-h-[75%] overflow-x-hidden overflow-y-scroll bg-slate-800 rounded-xl p-6 m-6">
-      {chatData.map((item: any, index: number) => {
+    <motion.section
+      exit={{ opacity: 0 }}
+      className="min-h-[75%] max-h-[75%] overflow-x-hidden overflow-y-scroll bg-slate-800 rounded-xl p-6 m-6"
+    >
+      <PageSwitch.TopToBottom />
+
+      {chatData.map((item: any, index: number, { length }) => {
         if (item.sender === "user") {
           if (item.content.text) {
-            return <UserBalloon key={index} message={item.content.text} />;
+            if (index + 1 == length) {
+              return (
+                <>
+                  <UserBalloon key={index} message={item.content.text} />
+                  <BotBalloon loading={true} />
+                </>
+              );
+            } else {
+              return <UserBalloon key={index} message={item.content.text} />;
+            }
           }
         } else {
           if (item.content.text) {
-            return (
-              <BotBalloon
-                key={index}
-                message={item.content.text}
-                messageId={item.messageId}
-                translation={item.content.translation}
-              />
-            );
+            if (index + 1 == length) {
+              return (
+                <BotBalloon
+                  message={item.content.text}
+                  messageId={item.messageId}
+                  translation={item.content.translation}
+                />
+              );
+            } else {
+              return (
+                <BotBalloon
+                  message={item.content.text}
+                  messageId={item.messageId}
+                  translation={item.content.translation}
+                />
+              );
+            }
           }
         }
         return null;
       })}
-    </main>
+    </motion.section>
   );
 }

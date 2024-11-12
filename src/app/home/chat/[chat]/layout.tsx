@@ -39,7 +39,7 @@ export default function RootLayout({
       className="bg-slate-900 text-slate-300"
     >
       <SessionProvider>
-        <section className="w-full p-6 fixed flex flex-1 justify-between flex-col h-full">
+        <section className="w-full fixed flex justify-between flex-col h-full p-6">
           <Header title={title} id={chatId as string} />
 
           {children}

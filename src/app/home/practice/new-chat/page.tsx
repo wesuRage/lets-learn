@@ -1,11 +1,12 @@
 "use client";
 
-import LanguageSelector from "@/components/LanguageSelector";
+import LanguageSelector, { styles } from "@/components/LanguageSelector";
 import Spinner from "@/components/Spinner";
+import { PageSwitch } from "@/components/transitions/PageSwitch";
 import axios from "axios";
 import { Select, Option } from "bymax-react-select";
+import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { BiArrowBack } from "react-icons/bi";
@@ -18,6 +19,7 @@ export default function NewChat() {
   const [topic, setTopic] = useState<string | null>(null);
   const [personality, setPersonality] = useState<string>("");
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [pageSwitch, setPageSwitch] = useState<boolean>(false);
 
   const { data: session } = useSession();
   const router = useRouter();
@@ -76,23 +78,38 @@ export default function NewChat() {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      router.push(`/home/chat/${chatId}`);
+      setPageSwitch(true);
+
+      setTimeout(() => {
+        router.push(`/home/chat/${chatId}`);
+      }, 500);
     } catch (error) {
       alert(`Error: ${error}`);
     }
   }
 
   return (
-    <main className="flex justify-center h-full w-full max-w-lg gap-8 mt-4">
+    <motion.section
+      exit={{ opacity: 0 }}
+      className="flex justify-center h-full w-full max-w-lg gap-8 mt-4"
+    >
+      <PageSwitch.TopToBottom />
+      {pageSwitch && <PageSwitch.BottomToTop />}
+
       <div className="w-full">
         <div className="flex">
-          <Link
-            href={"/home/practice/chats"}
-            prefetch
+          <button
+            onClick={() => {
+              setPageSwitch(true);
+
+              setTimeout(() => {
+                router.push("/home/practice/chats");
+              }, 500);
+            }}
             className="p-2 rounded-full me-2 bg-slate-800 relative top-1"
           >
             <BiArrowBack />
-          </Link>
+          </button>
         </div>
         <section className="flex items-center justify-between w-full gap-4 mb-4">
           <h1 className="font-bold whitespace-nowrap">
@@ -126,6 +143,7 @@ export default function NewChat() {
             <Select
               id="language-selector"
               value={level ?? ""}
+              styles={styles}
               isMulti={false}
               isClearable={false}
               options={options}
@@ -182,6 +200,6 @@ export default function NewChat() {
           )}
         </section>
       </div>
-    </main>
+    </motion.section>
   );
 }
