@@ -1,16 +1,20 @@
+"use client";
+
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { HiTranslate } from "react-icons/hi";
 import { HiMiniSpeakerWave } from "react-icons/hi2";
 import { MdContentCopy } from "react-icons/md";
-
 import Spinner from "../Spinner";
+import { AudioAnalyserContext } from "../../app/layout";
+import BotBalloonButton from "./BotBalloonButton";
 
 interface BotBalloonProps {
   message?: string;
   messageId?: string;
   translation?: string;
   loading?: boolean;
+  onAudioAnalyser?: (analyser: AnalyserNode) => void;
 }
 
 function format(message: string) {
@@ -23,10 +27,7 @@ function format(message: string) {
     );
 
     return (
-      <>
-        <span dangerouslySetInnerHTML={{ __html: boldFormatted }} />
-        {index < pieces.length - 1 && <br />}
-      </>
+      <span key={index} dangerouslySetInnerHTML={{ __html: boldFormatted }} />
     );
   });
 
@@ -39,9 +40,10 @@ export default function BotBalloon({
   translation,
   loading,
 }: BotBalloonProps) {
-  const [showTranslation, setShowTranslation] = useState<boolean>(false);
-  const [disabled, setDisabled] = useState<boolean>(false);
+  const [disabled, setDisabled] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const handleAudioAnalyser = useContext(AudioAnalyserContext);
 
   async function findAndPlay(messageId: string) {
     setDisabled(true);
@@ -49,7 +51,9 @@ export default function BotBalloon({
       const response = await axios.post(
         "/api/audio",
         { messageId },
-        { headers: { "Content-Type": "application/json" } }
+        {
+          headers: { "Content-Type": "application/json" },
+        }
       );
 
       const audioData = response.data.audioStringBuffer?.audioData;
@@ -59,17 +63,26 @@ export default function BotBalloon({
         return;
       }
 
-      // Pausa o áudio existente e reinicia se já houver um
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
 
-      // Cria uma nova instância de áudio com o conteúdo codificado em base64
-      audioRef.current = new Audio(`data:audio/mp3;base64,${audioData}`);
-      audioRef.current.play();
+      const audio = new Audio(`data:audio/mp3;base64,${audioData}`);
+      audioRef.current = audio;
 
-      audioRef.current.onended = () => setDisabled(false);
+      const audioContext = new window.AudioContext();
+      const source = audioContext.createMediaElementSource(audio);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+
+      handleAudioAnalyser(analyser);
+
+      audio.play();
+      audio.onended = () => setDisabled(false);
     } catch (error) {
       console.error("Erro ao buscar o áudio:", error);
       setDisabled(false);
@@ -98,29 +111,23 @@ export default function BotBalloon({
                 {disabled ? (
                   <Spinner />
                 ) : (
-                  <button
-                    className="text-2xl p-3 rounded-full hover:bg-slate-900 transition ease-in-out duration-150"
-                    onClick={() => findAndPlay(messageId!)}
-                  >
-                    <HiMiniSpeakerWave />
-                  </button>
+                  <BotBalloonButton
+                    Icon={HiMiniSpeakerWave}
+                    func={() => findAndPlay(messageId!)}
+                  />
                 )}
 
-                <button
-                  className="text-2xl p-3 rounded-full hover:bg-slate-900 transition ease-in-out duration-150"
-                  onClick={() => setShowTranslation(!showTranslation)}
-                >
-                  <HiTranslate />
-                </button>
+                <BotBalloonButton
+                  Icon={HiTranslate}
+                  func={() => setShowTranslation(!showTranslation)}
+                />
 
-                <button
-                  className="text-2xl p-3 rounded-full hover:bg-slate-900 transition ease-in-out duration-150"
-                  onClick={() =>
+                <BotBalloonButton
+                  Icon={MdContentCopy}
+                  func={() =>
                     showTranslation ? copy(translation!) : copy(message!)
                   }
-                >
-                  <MdContentCopy />
-                </button>
+                />
               </div>
             </section>
           </>
