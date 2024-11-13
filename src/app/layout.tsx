@@ -1,3 +1,5 @@
+// TODO: arrumar o erro de tipos estranho na compilação
+
 "use client";
 
 import "@/app/globals.css";
@@ -57,8 +59,10 @@ export default function Layout({ children }: LayoutProps) {
           style={{ backgroundColor: background }}
           className="text-slate-300 min-h-screen"
         >
-          <AudioAnalyserContext.Provider value={handleAudioAnalyser}>
-            <SessionProvider>{children}</SessionProvider>
+          <AudioAnalyserContext.Provider
+            value={(analyser: AnalyserNode) => handleAudioAnalyser(analyser)}
+          >
+            z<SessionProvider>{children}</SessionProvider>
           </AudioAnalyserContext.Provider>
         </body>
       </html>
