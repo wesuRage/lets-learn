@@ -6,7 +6,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Key, useEffect, useState } from "react";
 import { BiLogOut } from "react-icons/bi";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { PageSwitch } from "@/components/transitions/PageSwitch";
 
 const variants = {
@@ -19,15 +19,28 @@ const variants = {
     },
   },
   card: {
-    initial: {
-      opacity: 0,
-      x: -50,
+    card_text: {
+      initial: {
+        opacity: 0,
+        x: -50,
+      },
+      animate: {
+        opacity: 1,
+        x: 0,
+        transition: {
+          duration: 0.3,
+        },
+      },
     },
-    animate: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: 0.3,
+    card_container: {
+      initial: {
+        opacity: 0,
+      },
+      animate: {
+        opacity: 1,
+        transition: {
+          duration: 0.3,
+        },
       },
     },
   },
@@ -108,9 +121,12 @@ export default function Chats() {
               {chatData.map((chat: any, index: Key) => (
                 <ChatBalloon
                   key={index}
-                  variants={variants.card}
+                  button_variant={variants.card.card_container}
+                  text_variant={variants.card.card_text}
                   id={chat.chatId}
                   title={chat.title}
+                  language={chat.language}
+                  feedback={chat.feedback}
                   createdAt={chat.createdAt}
                   setPageSwitch={setPageSwitch}
                 />
