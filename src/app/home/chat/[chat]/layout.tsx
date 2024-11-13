@@ -3,27 +3,24 @@
 import Header from "@/components/Header";
 import SendOptions from "@/components/SendOptions";
 import axios from "axios";
-import { SessionProvider } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   const pathname = usePathname();
   const chatId = pathname.split("/").pop();
-  console.log(chatId);
-
-  const [title, setTitle] = useState<string>();
+  const [title, setTitle] = useState<string>("");
 
   useEffect(() => {
     const fetchTitle = async () => {
       if (chatId) {
         try {
           const response = await axios.get(`/api/chat/${chatId}`);
-          setTitle(await response.data.data.title);
+          setTitle(response.data.data.title);
         } catch (error) {
           console.error("Error fetching title:", error);
         }
@@ -34,19 +31,12 @@ export default function RootLayout({
   }, [chatId]);
 
   return (
-    <body
-      suppressHydrationWarning={true}
-      className="bg-slate-900 text-slate-300"
-    >
-      <SessionProvider>
-        <section className="w-full fixed flex justify-between flex-col h-full p-6">
-          <Header title={title} id={chatId as string} />
-
-          {children}
-
-          <SendOptions uuid={chatId as string} />
-        </section>
-      </SessionProvider>
-    </body>
+    <div className="text-slate-300 transition-colors duration-200 ease-in-out">
+      <section className="w-full fixed flex justify-between flex-col h-full p-6">
+        <Header title={title} id={chatId || ""} />
+        {children}
+        <SendOptions uuid={chatId || ""} />
+      </section>
+    </div>
   );
 }
