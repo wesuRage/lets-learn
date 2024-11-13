@@ -8,11 +8,11 @@ export default function PracticeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <body
+    <div
       suppressHydrationWarning={true}
       className="bg-slate-900 text-slate-300 flex justify-center"
     >
       <SessionProvider>{children}</SessionProvider>
-    </body>
+    </div>
   );
 }
