@@ -62,7 +62,7 @@ export default function Layout({ children }: LayoutProps) {
           <AudioAnalyserContext.Provider
             value={(analyser: AnalyserNode) => handleAudioAnalyser(analyser)}
           >
-            z<SessionProvider>{children}</SessionProvider>
+            <SessionProvider>{children}</SessionProvider>
           </AudioAnalyserContext.Provider>
         </body>
       </html>
