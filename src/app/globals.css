@@ -18,10 +18,10 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-3);
+  background: var(--bg-1);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-2);
+  background: var(--bg-3);
   border-radius: 10px;
 }
