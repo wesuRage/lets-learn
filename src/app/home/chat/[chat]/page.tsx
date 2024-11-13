@@ -4,7 +4,7 @@
 
 import UserBalloon from "@/components/Balloons/UserBalloon";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useSession } from "next-auth/react";
@@ -16,7 +16,6 @@ export default function Chat({ params }: any) {
   const { chat } = React.use(params);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [chatData, setChatData] = useState<Array<any>>([]);
   const { data: session } = useSession({
     required: true,
     onUnauthenticated() {
@@ -25,6 +24,14 @@ export default function Chat({ params }: any) {
   });
 
   const userId = session?.user.id;
+  const [chatData, setChatData] = useState<Array<any>>([]);
+  const [background, setBackground] = useState<string>("rgb(15, 23, 42)");
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const previousChatLength = useRef(0);
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,6 +60,16 @@ export default function Chat({ params }: any) {
 
     return () => clearInterval(intervalId);
   }, [chat, router, userId]);
+
+  useEffect(() => {
+    if (
+      chatData.length > previousChatLength.current ||
+      previousChatLength.current === 0
+    ) {
+      scrollToBottom();
+    }
+    previousChatLength.current = chatData.length;
+  }, [chatData]);
 
   if (loading || !chatData) {
     return (
@@ -85,27 +102,19 @@ export default function Chat({ params }: any) {
           }
         } else {
           if (item.content.text) {
-            if (index + 1 == length) {
-              return (
-                <BotBalloon
-                  message={item.content.text}
-                  messageId={item.messageId}
-                  translation={item.content.translation}
-                />
-              );
-            } else {
-              return (
-                <BotBalloon
-                  message={item.content.text}
-                  messageId={item.messageId}
-                  translation={item.content.translation}
-                />
-              );
-            }
+            return (
+              <BotBalloon
+                message={item.content.text}
+                messageId={item.messageId}
+                translation={item.content.translation}
+              />
+            );
           }
         }
         return null;
       })}
+
+      <div ref={chatEndRef} />
     </motion.section>
   );
 }
