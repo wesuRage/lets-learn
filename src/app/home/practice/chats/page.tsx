@@ -2,18 +2,18 @@
 
 import ChatBalloon from "@/components/Balloons/ChatBalloon";
 import axios from "axios";
-import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Key, useEffect, useState } from "react";
-import { BiLogOut } from "react-icons/bi";
-import { motion, Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { PageSwitch } from "@/components/transitions/PageSwitch";
+import { IoSettingsSharp } from "react-icons/io5";
+import PageSwitchButton from "@/components/transitions/PageSwitchButton";
 
 const variants = {
   container: {
     animate: {
       transition: {
-        delay: 0.5, // Adiciona um delay de 0,5 segundos antes de iniciar
+        delay: 0.5,
         staggerChildren: 0.1,
       },
     },
@@ -47,11 +47,10 @@ const variants = {
 };
 
 export default function Chats() {
-  const [loading, setLoading] = useState(true); // Estado de carregamento
-  const [chatData, setChatData] = useState<any>(null); // Estado para armazenar os dados do chat
+  const [loading, setLoading] = useState(true);
+  const [chatData, setChatData] = useState<any>(null);
   const [pageSwitch, setPageSwitch] = useState<boolean>(false);
   const { data: session } = useSession();
-  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,15 +59,15 @@ export default function Chats() {
         const response = await axios.post("/api/chats/", {
           userId: session?.user.id,
         });
-        if (response.data !== undefined) setChatData(response.data.data); // Armazena os dados do chat
+        if (response.data !== undefined) setChatData(response.data.data);
       } catch (error) {
         console.error("Error fetching chat data:", error);
       } finally {
-        setLoading(false); // Atualiza o estado de carregamento
+        setLoading(false);
       }
     };
 
-    fetchData(); // Chama a função de busca de dados
+    fetchData();
   }, [session?.user.id]);
 
   if (loading) {
@@ -88,28 +87,24 @@ export default function Chats() {
       <section className="w-full">
         <div className="flex justify-between w-full">
           <h1 className="font-bold">Chats</h1>
-          <button
-            onClick={() => signOut()}
-            className="flex font-bold hover:text-red-500 transition ease-in-out duration-150"
+          <PageSwitchButton
+            route="/home/practice/settings"
+            setPageSwitch={setPageSwitch}
+            className="flex font-bold"
           >
-            <BiLogOut className="text-2xl me-2" /> Sair
-          </button>
+            <IoSettingsSharp className="text-4xl me-2 hover:bg-slate-700 rounded-full transition ease-in-out duration-150 p-2" />
+          </PageSwitchButton>
         </div>
         <div className="text-center mt-20">
-          <button
-            onClick={() => {
-              setPageSwitch(true);
-
-              setTimeout(() => {
-                router.push("/home/practice/new-chat");
-              }, 500);
-            }}
+          <PageSwitchButton
+            route="/home/practice/new-chat"
+            setPageSwitch={setPageSwitch}
             className="hover:scale-125 transition ease-in-out duration-150 border-2 border-slate-800 hover:bg-slate-800 rounded-xl p-2 relative top-3"
           >
             <p className="font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-700 inline-block text-transparent bg-clip-text">
               Iniciar Novo Chat
             </p>
-          </button>
+          </PageSwitchButton>
           <br />
           <br />
           {chatData !== null && (
