@@ -25,7 +25,7 @@ const bottomToTop = {
 export const PageSwitch = {
   BottomToTop: () => (
     <motion.div
-      className="absolute z-50 flex items-center justify-center w-full bg-slate-700"
+      className="fixed z-50 flex items-center justify-center w-full bg-slate-700"
       initial="initial"
       animate="animate"
       variants={bottomToTop}
