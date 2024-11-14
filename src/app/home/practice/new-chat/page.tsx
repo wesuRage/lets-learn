@@ -3,12 +3,13 @@
 import LanguageSelector, { styles } from "@/components/LanguageSelector";
 import Spinner from "@/components/Spinner";
 import { PageSwitch } from "@/components/transitions/PageSwitch";
+import PageSwitchButton from "@/components/transitions/PageSwitchButton";
 import axios from "axios";
 import { Select, Option } from "bymax-react-select";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BiArrowBack } from "react-icons/bi";
 import { v4 as uuidv4 } from "uuid";
 
@@ -17,14 +18,31 @@ export default function NewChat() {
   const [feedbackOption, setFeedbackOption] = useState<any>(null);
   const [level, setLevel] = useState<any>(null);
   const [topic, setTopic] = useState<string | null>(null);
-  const [personality, setPersonality] = useState<string>("");
+  const [personality, setPersonality] = useState<any>("");
+  const [personalities, setPersonalities] = useState<Option[]>([]);
+  const [personalityText, setPersonalityText] = useState<string>();
   const [disabled, setDisabled] = useState<boolean>(false);
   const [pageSwitch, setPageSwitch] = useState<boolean>(false);
-
   const { data: session } = useSession();
   const router = useRouter();
 
+  const variants = {
+    initial: {
+      opacity: 0,
+    },
+    animate: {
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+      },
+    },
+  };
+
+  const [personalitiesLoading, setPersonalitiesLoading] =
+    useState<boolean>(true);
+
   const randomInt = Math.floor(Math.random() * (10 - 0 + 1)) + 0;
+
   const placeHolders = [
     "Uma conversa em um portão de embarque no aeroporto",
     "Um diálogo em uma cafeteria movimentada",
@@ -39,7 +57,7 @@ export default function NewChat() {
     "Um diálogo em um restaurante em Paris",
   ];
 
-  const options: Option[] = useMemo(
+  const optionsCEFR: Option[] = useMemo(
     () => [
       { id: "1", value: "A1", label: "A1" },
       { id: "2", value: "A2", label: "A2" },
@@ -50,6 +68,40 @@ export default function NewChat() {
     ],
     []
   );
+
+  useEffect(() => {
+    const fetchPersonalities = async () => {
+      setPersonalitiesLoading(true);
+      const response = await axios.post(
+        "/api/personality",
+        { userId: session?.user.id },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      const data = await response.data.data;
+
+      const allPersonalities = data.map((item: any, index: number) => ({
+        id: `${index}`,
+        value: item.ai_personality,
+        label: item.ai_name,
+      }));
+
+      setPersonalities(allPersonalities);
+      setPersonalitiesLoading(false);
+    };
+
+    fetchPersonalities();
+  }, []);
+
+  function handlePersonalityChange(selectedOption: Option | Option[] | null) {
+    if (Array.isArray(selectedOption)) {
+      setPersonality(selectedOption[0]?.label || "");
+      setPersonalityText(selectedOption[0]?.value || "");
+    } else {
+      setPersonality(selectedOption?.label || "");
+      setPersonalityText(selectedOption?.value || "");
+    }
+  }
 
   async function createChat() {
     const chatId = uuidv4();
@@ -88,28 +140,31 @@ export default function NewChat() {
     }
   }
 
+  if (personalities.length === 0 || personalitiesLoading) {
+    return (
+      <div className="fixed top-0 left-0 w-full h-full bg-slate-700 text-slate-700">
+        .
+      </div>
+    );
+  }
+
   return (
     <motion.section
       exit={{ opacity: 0 }}
-      className="flex justify-center h-full w-full max-w-lg gap-8 mt-4"
+      className="flex justify-center h-full w-full max-w-lg gap-8 my-6"
     >
       <PageSwitch.TopToBottom />
       {pageSwitch && <PageSwitch.BottomToTop />}
 
       <div className="w-full">
         <div className="flex">
-          <button
-            onClick={() => {
-              setPageSwitch(true);
-
-              setTimeout(() => {
-                router.push("/home/practice/chats");
-              }, 500);
-            }}
+          <PageSwitchButton
+            route="/home/practice/chats"
+            setPageSwitch={setPageSwitch}
             className="p-2 rounded-full me-2 bg-slate-800 relative top-1"
           >
             <BiArrowBack />
-          </button>
+          </PageSwitchButton>
         </div>
         <section className="flex items-center justify-between w-full gap-4 mb-4">
           <h1 className="font-bold whitespace-nowrap">
@@ -146,7 +201,7 @@ export default function NewChat() {
               styles={styles}
               isMulti={false}
               isClearable={false}
-              options={options}
+              options={optionsCEFR}
               placeholder="Selecione o Nível CEFR"
               noOptionsMessage="Nível não encontrado"
               onChange={(selectedOption) => setLevel(selectedOption)}
@@ -170,23 +225,52 @@ export default function NewChat() {
           </label>
         </section>
 
-        <section className="mt-4">
-          <label htmlFor="personality">
-            <p className="font-bold">Personalidade da IA:</p>
-            <input
-              type="text"
-              name="personality"
-              autoComplete="off"
-              onChange={(e) => setPersonality(e.target.value)}
-              placeholder="Como você quer que ela se comporte"
-              className="outline-none w-full rounded-md bg-slate-800 text-slate-300 p-2"
-            />
-          </label>
+        <section className="my-4">
+          <section className="flex items-center justify-between w-full gap-4 mb-4">
+            <p className="font-bold flex">Personalidade da IA:</p>
+            <div className="w-72">
+              <Select
+                id="personality"
+                value={personalities}
+                styles={styles}
+                isMulti={false}
+                isClearable={true}
+                options={personalities}
+                placeholder="Selecione a Personalidade"
+                noOptionsMessage="Personalidade não encontrada"
+                onChange={handlePersonalityChange}
+              />
+            </div>
+          </section>
+
+          <p className="italic mb-2 text-slate-500">
+            Se não houver opções de personalidade, você pode criar uma em
+            <PageSwitchButton
+              route="/home/practice/chats"
+              setPageSwitch={setPageSwitch}
+              className="underline italic"
+            >
+              configurações
+            </PageSwitchButton>{" "}
+            ou simplesmente escrever uma abaixo!
+          </p>
+
+          <textarea
+            name="personality"
+            autoComplete="off"
+            rows={5}
+            value={personalityText}
+            onChange={(e) => setPersonality(e.target.value)}
+            placeholder="Personalidade da IA"
+            className="outline-none w-full resize-none rounded-md bg-slate-800 text-slate-300 p-2"
+          />
         </section>
 
         <section className="w-full flex justify-center">
           {disabled ? (
-            <Spinner />
+            <motion.div exit={{ opacity: 1 }} variants={variants}>
+              <Spinner />
+            </motion.div>
           ) : (
             <button
               disabled={disabled}
