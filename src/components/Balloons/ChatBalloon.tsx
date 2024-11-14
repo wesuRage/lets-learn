@@ -1,18 +1,15 @@
-import { motion, Variant, Variants } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction } from "react";
 
 function formatTimestamp(timestamp: string) {
-  // Cria um objeto Date a partir da string
   const date = new Date(timestamp);
 
-  // Verifica se a data é válida
   if (isNaN(date.getTime())) {
     console.error("Invalid date:", timestamp);
-    return "Invalid date"; // Retorna um valor padrão caso a data seja inválida
+    return "Invalid date";
   }
 
-  // Formata a data para o formato desejado
   return date.toLocaleString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -20,7 +17,7 @@ function formatTimestamp(timestamp: string) {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: false, // Para usar o formato de 24 horas
+    hour12: false,
   });
 }
 
